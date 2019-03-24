@@ -4,6 +4,7 @@ const passport = require('passport');
 const Strategy = require('passport-local').Strategy;
 const session = require('express-session');
 const bodyParser = require('body-parser');
+const connectEnsureLogin = require('connect-ensure-login');
 //
 const path = require('path');
 const db = require(path.join(__dirname, 'db'));
@@ -39,7 +40,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(session({ secret: 'cats' }));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(passport.initialize());
-app.use(passport. session());
+app.use(passport.session());
 //
 
 app.post('/login',
@@ -47,6 +48,21 @@ app.post('/login',
         successRedirect: '/',
         failureRedirect: '/bad',
     })
+);
+
+app.get('/logout',
+    connectEnsureLogin.ensureLoggedIn(),
+    function(req, res) {
+        req.logout();
+        res.send('logout successful');
+    }
+);
+
+app.get('/profile',
+    connectEnsureLogin.ensureLoggedIn(),
+    function(req, res) {
+        res.send(req.user);
+    }
 );
 
 app.get('/bad', (req,res) => res.send('BAD'));
