@@ -43,29 +43,32 @@ app.use(passport.initialize());
 app.use(passport.session());
 //
 
-app.post('/login',
-    passport.authenticate('local', { 
-        successRedirect: '/',
-        failureRedirect: '/bad',
-    })
-);
+app.post('/api/login', function(req, res, next) {
+    passport.authenticate('local', function(err, user, info) {
+        if (err) { return next(err); }
+        if (!user) { return res.status(401).end(); }
+        req.logIn(user, function(err) {
+            if (err) { return next(err); }
+            return res.status(200).end();
+        });
+    })(req, res, next);
+});
 
-app.get('/logout',
+app.get('/api/logout',
     connectEnsureLogin.ensureLoggedIn(),
     function(req, res) {
         req.logout();
-        res.send('logout successful');
+        res.status(200).end();
     }
 );
 
-app.get('/profile',
+app.get('/api/profile',
     connectEnsureLogin.ensureLoggedIn(),
     function(req, res) {
-        res.send(req.user);
+        res.json({displayName: req.user.displayName});
     }
 );
 
-app.get('/bad', (req,res) => res.send('BAD'));
 app.get('/', (req,res) => res.send('Hello World!'));
 
 app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`));
