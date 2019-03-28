@@ -1,0 +1,23 @@
+<html>
+    <head>
+        <title>Profile</title>
+        <script>
+            window.addEventListener('DOMContentLoaded', function(event) {
+                var xhttp = new XMLHttpRequest();
+                xhttp.open('GET', '/api/profile');
+                xhttp.send();
+                xhttp.onreadystatechange = function() {
+                    if (this.readyState == 4 && this.status == 200) {
+                        var json = JSON.parse(this.responseText);
+                        document.getElementById('span-name').innerHTML = json.displayName; 
+                    } else if ( this.readyState == 4 && this.status == 401) {
+                        window.location.href = '/';
+                    }
+                };
+            });
+        </script>
+    <head>
+    <body>
+        <span>Hello, </span><span id="span-name"></span>
+    </body>
+</html>
