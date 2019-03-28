@@ -8,15 +8,17 @@ const connectEnsureLogin = require('connect-ensure-login');
 //
 const path = require('path');
 const db = require(path.join(__dirname, 'db'));
+const crypto = require('crypto');
 
 const PORT = 3000;
 
 passport.use(new Strategy(
     function(username, password, cb) {
-        db.sql.findByUsername(username, function(err, user) {
+        db.users.findByUsername(username, function(err, user) {
             if (err) { return cb(err); }
             if (!user) { return cb(null, false); }
-            if (user.password != password) { return cb(null, false); }
+            var hash = crypto.createHmac('sha256', user.salt).update(password).digest('hex');
+            if (user.password != hash) { return cb(null, false); }
             return cb(null, user);
         });
     })
@@ -27,7 +29,7 @@ passport.serializeUser(function(user, cb) {
 });
 
 passport.deserializeUser(function(id, cb) {
-    db.sql.findById(id, function (err, user) {
+    db.users.findById(id, function (err, user) {
         if (err) { return cb(err); }
         cb(null, user);
     });
@@ -70,6 +72,16 @@ app.get('/api/profile', function(req, res) {
     } else {
         res.status(401).end();
     }
+});
+
+app.post('/api/register', function(req, res) {
+    db.users.insertUser(req.body.username, req.body.password).then(result => {
+        if (result) {
+            res.status(200).end();
+        } else {
+            res.status(500).end();
+        }
+    });
 });
 
 app.get('/', (req,res) => res.send('Hello World!'));
