@@ -4,19 +4,20 @@
         window.addEventListener('DOMContentLoaded', function(event) {
             document.getElementById('btn-submit').onclick = function(event) {
                 event.preventDefault();
+                console.log('Hello from btn-submit');
                 var xmlhttp = new XMLHttpRequest();
                 xmlhttp.onreadystatechange = function() {
                     if (this.readyState === 4 && this.status === 200) {
                         //console.log('success');
-                        window.location.href = '/profile.html';
-                    } else if (this.readyState === 4 && this.status === 401) {
-                        //console.log('failed');
                         window.location.href = '/';
+                    } else if (this.readyState === 4 && this.status === 500) {
+                        //console.log('failed');
+                        window.location.href = '/register.html';
                     }
                 }
                 var username = document.getElementById('inp-username').value;
                 var password = document.getElementById('inp-password').value;
-                xmlhttp.open('POST', '/api/login');
+                xmlhttp.open('POST', '/api/register');
                 xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
                 xmlhttp.send('username=' + username + '&password=' + password);
             };   
@@ -24,6 +25,7 @@
     </script>
 </head>
 <body>
+<h1>Register</h1>
 <form action="/api/login" method="post">
     <div>
         <label>Username:</label>
@@ -34,8 +36,8 @@
         <input type="password" id="inp-password" name="password"/>
     </div>
     <div>
-        <input type="submit" id="btn-submit" value="Log In"/>
-        <a href="/register.html">Register</a>
+        <input type="submit" id="btn-submit" value="Register"/>
+        <a href="/">Login page</a>
     </div>
 </form>
 </body>

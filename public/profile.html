@@ -14,10 +14,21 @@
                         window.location.href = '/';
                     }
                 };
+                document.getElementById('btn-logout').onclick = function(event) {
+                    var xmlhttp = new XMLHttpRequest();
+                    xmlhttp.onreadystatechange = function() {
+                        if (this.readyState === 4 && this.status === 200) {
+                            window.location.href = '/';
+                        }
+                    }
+                    xmlhttp.open('GET', '/api/logout');
+                    xmlhttp.send();
+                }
             });
         </script>
     <head>
     <body>
         <span>Hello, </span><span id="span-name"></span>
+        <input type="button" id="btn-logout" value="Logout"/>
     </body>
 </html>
